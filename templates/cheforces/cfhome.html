@@ -1,0 +1,61 @@
+{% extends 'cheforces/base.html' %}
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>nothing</title>-->
+<!--</head>-->
+<!--<body>-->
+{% block body_block %}
+<h2>HELLO {{userinfo.handle}}</h2>
+
+<!--verdicts pie chart-->
+<div id="container" style="width: 75%;">
+    <h4>Verdicts</h4>
+    <canvas id="pie-chart"></canvas>
+    <canvas id ="myChart"></canvas>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <script>
+
+    var config = {
+      type: 'pie',
+      data: {
+        datasets: [{
+          data: {{ verdicts_data|safe }},
+          backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(255, 159, 64, 0.2)',
+          'rgba(255, 205, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(201, 203, 207, 0.2)'
+
+          ],
+          label: 'verdicts_data'
+        }],
+        labels: {{ verdicts_labels|safe }}
+      },
+      options: {
+        responsive: true
+      }
+    };
+
+    window.onload = function() {
+      var ctx = document.getElementById('pie-chart').getContext('2d');
+      window.myPie = new Chart(ctx, config);
+    };
+  </script>
+
+{% for key, value in userinfo.items %}
+    <tr>
+        <td>{{ key }} </td>
+        <td>{{ value }} </td>
+    </tr>
+{% endfor %}
+{% endblock %}
+<!--</body>-->
+<!--</html>-->
