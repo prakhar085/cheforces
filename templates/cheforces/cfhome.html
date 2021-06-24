@@ -8,82 +8,163 @@
 <!--<body>-->
 {% block body_block %}
 <h2>HELLO {{userinfo.handle}}</h2>
+<table class="columns">
+  <tr>
+    <!--verdicts pie chart-->
+    <td><div id="verdict_pie_chart" style="border: 1px solid #ccc"></div></td>
+    <!--tags pie chart-->
+    <td><div id="tag_pie_chart" style="border: 1px solid #ccc"></div></td>
+  </tr>>
+</table>
+<div id="rating_distribution" style="width: 800px; height: 500px;"></div>
 
-<!--verdicts pie chart-->
-<div id="container" style="width: 50%;">
-    <h4>Verdicts</h4>
-    <canvas id="verdict_pie_chart"></canvas>
-
-  </div>
 <!--script for pie chart for verdict -->
 <script>
 
-    var config = {
-      type: 'pie',
-      data: {
-        datasets: [{
-          data: {{ verdicts_data|safe }},
-          backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(255, 205, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(201, 203, 207, 0.2)'
+    // var verdict_data_config = {
+    //   type: 'pie',
+    //   data: {
+    //     datasets: [{
+    //       data: {{ verdicts_data|safe }},
+    //       backgroundColor: [
+    //       'rgba(255, 99, 132, 0.2)',
+    //       'rgba(255, 159, 64, 0.2)',
+    //       'rgba(255, 205, 86, 0.2)',
+    //       'rgba(75, 192, 192, 0.2)',
+    //       'rgba(54, 162, 235, 0.2)',
+    //       'rgba(153, 102, 255, 0.2)',
+    //       'rgba(201, 203, 207, 0.2)'
 
-          ],
-          label: 'verdicts_data'
-        }],
-        labels: {{ verdicts_labels|safe }}
-      },
-      options: {
-        responsive: true
-      }
+    //       ],
+    //       label: 'verdicts_data'
+    //     }],
+    //     labels: {{ verdicts_labels|safe }}
+    //   },
+    //   options: {
+    //     responsive: true
+    //   }
+    // };
+
+    // var tag_data_config = {
+    //   type: 'pie',
+    //   data: {
+    //     datasets: [{
+    //       data: {{ tags_data|safe }},
+    //       backgroundColor: [
+    //       'rgba(255, 99, 132, 0.2)',
+    //       'rgba(255, 159, 64, 0.2)',
+    //       'rgba(255, 205, 86, 0.2)',
+    //       'rgba(75, 192, 192, 0.2)',
+    //       'rgba(54, 162, 235, 0.2)',
+    //       'rgba(153, 102, 255, 0.2)',
+    //       'rgba(201, 203, 207, 0.2)'
+
+    //       ],
+    //       label: 'verdicts_data'
+    //     }],
+    //     labels: {{ tags_label|safe }}
+    //   },
+    //   options: {
+    //     responsive: true
+    //   }
+    // };
+
+
+    // window.onload = function() {
+    //   var __verdict = document.getElementById('verdict_pie_chart').getContext('2d');
+    //   window.myPie = new Chart(__verdict, verdict_data_config);
+    //   var __tag = document.getElementById('tag_pie_chart').getContext('2d');
+    //   window.myPie = new Chart(__tag, tag_data_config);
+    // };
+
+
+    google.charts.load('current', {packages: ['corechart']});
+    google.charts.setOnLoadCallback(drawVerdictChart);
+    google.charts.setOnLoadCallback(drawTagsChart);
+
+    function drawVerdictChart() {
+      // Define the chart to be drawn.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Verdict');
+      data.addColumn('number', 'Percentage');
+      data.addRows({{verdicts_data|safe}});
+
+      // Instantiate and draw the chart.
+      var chart = new google.visualization.PieChart(document.getElementById('verdict_pie_chart'));
+      chart.draw(data, null);
+    }
+
+    function drawTagsChart() {
+      // Define the chart to be drawn.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Verdict');
+      data.addColumn('number', 'Percentage');
+      data.addRows({{tags_data|safe}});
     };
 
-    window.onload = function() {
-      var ctx = document.getElementById('verdict_pie_chart').getContext('2d');
-      window.myPie = new Chart(ctx, config);
-    };
+      // Instantiate and draw the chart.
+      var chart = new google.visualization.PieChart(document.getElementById('tag_pie_chart'));
+      chart.draw(data, null);
+    }
+
   </script>
 
 
 
 <!--bar plot for rating distribution-->
-<div id="rating_distribution_container" style="width: 40%">
+<!-- <div id="rating_distribution_container" style="width: 40%">
     <canvas id="rating_distribution"></canvas>
-</div>
+</div> -->
 <!--script for rating_distribution bar plot-->
 <script>
-    var ctx = document.getElementById('rating_distribution').getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: {{ratings_label|safe}},
-        datasets: [{
-            label: 'Ratings of problems solved',
-            data: {{ratings_data|safe}},
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
+//     var ctx = document.getElementById('rating_distribution').getContext('2d');
+// var myChart = new Chart(ctx, {
+//     type: 'bar',
+//     data: {
+//         labels: {{ratings_label|safe}},
+//         datasets: [{
+//             label: 'Ratings of problems solved',
+//             data: {{ratings_data|safe}},
+//             backgroundColor: [
+//                 'rgba(255, 99, 132, 0.2)',
 
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
+//             ],
+//             borderColor: [
+//                 'rgba(255, 99, 132, 1)',
 
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
+//             ],
+//             borderWidth: 1
+//         }]
+//     },
+//     options: {
+//         scales: {
+//             y: {
+//                 beginAtZero: true
+//             }
+//         }
+//     }
+// });
+</script> 
+
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['bar']});
+  google.charts.setOnLoadCallback(drawRatingChart);
+
+  function drawRatingChart() {
+    var data = google.visualization.arrayToDataTable({{ratings_data|safe}});
+
+    var options = {
+      chart: {
+        title: 'Rating Distribution of Problems',
+      }
+    };
+
+    var chart = new google.charts.Bar(document.getElementById('rating_distribution'));
+
+    chart.draw(data, google.charts.Bar.convertOptions(options));
+  }
 </script>
+
 
 
 <!--script for pie chart of tags -->
