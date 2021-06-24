@@ -62,6 +62,8 @@ def cf_home(request, handle):
 
 
 
+    #tags and verdicts labels for drawing pie chart
+    
     tags_labels = list(question_tags.keys())
     tags_data= list(question_tags.values())
     verdicts_labels = list(verdicts.keys())
