@@ -55,9 +55,10 @@ def cf_home(request, handle):
     question_tags={}
     for i in range(len(user_submissions)):
         verdicts[user_submissions[i]['verdict']] = verdicts.get(user_submissions[i]['verdict'], 0) + 1
-        ratings[user_submissions[i]['problem']['rating']] = ratings.get(user_submissions[i]['problem']['rating'], 0) + 1
-        for j in range(len(user_submissions[i]['problem']['tags'])):
-            question_tags[user_submissions[i]['problem']['tags'][j]] = question_tags.get(user_submissions[i]['problem']['tags'][j],0)+1
+        if "rating" in user_submissions[i]["problem"] and user_submissions[i]['verdict']=="OK" :
+            ratings[user_submissions[i]['problem']['rating']] = ratings.get(user_submissions[i]['problem']['rating'], 0) + 1
+            for j in range(len(user_submissions[i]['problem']['tags'])):
+                question_tags[user_submissions[i]['problem']['tags'][j]] = question_tags.get(user_submissions[i]['problem']['tags'][j],0)+1
 
 
 
