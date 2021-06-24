@@ -52,13 +52,17 @@ def cf_home(request, handle):
 
     verdicts = {}
     ratings = {}
+    question_tags={}
     for i in range(len(user_submissions)):
         verdicts[user_submissions[i]['verdict']] = verdicts.get(user_submissions[i]['verdict'], 0) + 1
         ratings[user_submissions[i]['problem']['rating']] = ratings.get(user_submissions[i]['problem']['rating'], 0) + 1
+        for j in range(len(user_submissions[i]['problem']['tags'])):
+            question_tags[user_submissions[i]['problem']['tags'][j]] = question_tags.get(user_submissions[i]['problem']['tags'][j],0)+1
 
 
 
-
+    tags_labels = list(question_tags.keys())
+    tags_data= list(question_tags.values())
     verdicts_labels = list(verdicts.keys())
     verdicts_data = list(verdicts.values())
 
@@ -68,4 +72,7 @@ def cf_home(request, handle):
                                                      "verdicts_labels": verdicts_labels,
                                                      "verdicts_data": verdicts_data,
                                                      "ratings_label":ratings_labels,
-                                                     "ratings_data":ratings_data})
+                                                     "ratings_data":ratings_data,
+                                                     "tags_label": tags_labels,
+                                                     "tags_data": tags_data,
+                                                     })

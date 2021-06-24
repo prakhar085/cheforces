@@ -10,15 +10,13 @@
 <h2>HELLO {{userinfo.handle}}</h2>
 
 <!--verdicts pie chart-->
-<div id="container" style="width: 75%;">
+<div id="container" style="width: 50%;">
     <h4>Verdicts</h4>
-    <canvas id="pie-chart"></canvas>
-    <canvas id ="myChart"></canvas>
+    <canvas id="verdict_pie_chart"></canvas>
 
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
-  <script>
+<!--script for pie chart for verdict -->
+<script>
 
     var config = {
       type: 'pie',
@@ -45,10 +43,52 @@
     };
 
     window.onload = function() {
-      var ctx = document.getElementById('pie-chart').getContext('2d');
+      var ctx = document.getElementById('verdict_pie_chart').getContext('2d');
       window.myPie = new Chart(ctx, config);
     };
   </script>
+
+
+
+<!--bar plot for rating distribution-->
+<div id="rating_distribution_container" style="width: 40%">
+    <canvas id="rating_distribution"></canvas>
+</div>
+<!--script for rating_distribution bar plot-->
+<script>
+    var ctx = document.getElementById('rating_distribution').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ratings_label|safe}},
+        datasets: [{
+            label: 'Ratings of problems solved',
+            data: {{ratings_data|safe}},
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+
+
+<!--script for pie chart of tags -->
+
+
 
 {% for key, value in userinfo.items %}
     <tr>
