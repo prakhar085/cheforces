@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, HttpResponse
+from django.http import Http404
 from . import forms
 import urllib.request as request
 import json
@@ -13,10 +14,10 @@ def get_api_response(url):
             source = response.read()
             data = json.loads(source)
             data = data['result']
-            return data
+            return data    
 
     except:
-        print("wow")
+        raise Http404('Codeforces Handle Not Found!!!')
 
 
 def homepage(request):
