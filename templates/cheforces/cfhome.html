@@ -1,150 +1,85 @@
 {% extends 'cheforces/base.html' %}
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>nothing</title>-->
-<!--</head>-->
-<!--<body>-->
+
+
 {% block body_block %}
 <h2>HELLO {{userinfo.handle}}</h2>
-<table class="columns">
-  <tr>
-    <!--verdicts pie chart-->
-    <td><div id="verdict_pie_chart" style="border: 1px solid #ccc"></div></td>
-    <!--tags pie chart-->
-    <td><div id="tag_pie_chart" style="border: 1px solid #ccc"></div></td>
-  </tr>>
+
+<table class="table table-hover">
+  <tbody>
+    <tr>
+      <th scope="row">Handle</th>
+      <td><a href="https://codeforces.com/profile/{{userinfo.handle}}">{{userinfo.handle}}</a></td>
+    </tr>
+    <tr>
+      <th scope="row">Current Rating</th>
+      <td>{{userinfo.rating}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Max Rating</th>
+      <td>{{userinfo.maxRating}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Current Rank</th>
+      <td>{{userinfo.rank}}</td>
+    </tr>
+
+
+  </tbody>
 </table>
-<div id="rating_distribution" style="width: 800px; height: 500px;"></div>
 
-<!--script for pie chart for verdict -->
+<div id="rating_distribution""></div>
+
+<table>
+    <thead>
+        <tr>
+            <th colspan="2"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><div id="verdicts_pie_chart" style="width: 900px; height: 500px;"></div></td>
+            <td><div id="tags_pie_chart" style="width: 900px; height: 500px;"></div></td>
+        </tr>
+    </tbody>
+</table>
+
 <script>
+         google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
 
-    // var verdict_data_config = {
-    //   type: 'pie',
-    //   data: {
-    //     datasets: [{
-    //       data: {{ verdicts_data|safe }},
-    //       backgroundColor: [
-    //       'rgba(255, 99, 132, 0.2)',
-    //       'rgba(255, 159, 64, 0.2)',
-    //       'rgba(255, 205, 86, 0.2)',
-    //       'rgba(75, 192, 192, 0.2)',
-    //       'rgba(54, 162, 235, 0.2)',
-    //       'rgba(153, 102, 255, 0.2)',
-    //       'rgba(201, 203, 207, 0.2)'
+      function drawChart() {
 
-    //       ],
-    //       label: 'verdicts_data'
-    //     }],
-    //     labels: {{ verdicts_labels|safe }}
-    //   },
-    //   options: {
-    //     responsive: true
-    //   }
-    // };
+        var data = google.visualization.arrayToDataTable({{verdicts_data|safe}});
 
-    // var tag_data_config = {
-    //   type: 'pie',
-    //   data: {
-    //     datasets: [{
-    //       data: {{ tags_data|safe }},
-    //       backgroundColor: [
-    //       'rgba(255, 99, 132, 0.2)',
-    //       'rgba(255, 159, 64, 0.2)',
-    //       'rgba(255, 205, 86, 0.2)',
-    //       'rgba(75, 192, 192, 0.2)',
-    //       'rgba(54, 162, 235, 0.2)',
-    //       'rgba(153, 102, 255, 0.2)',
-    //       'rgba(201, 203, 207, 0.2)'
+        var options = {
+          title: 'verdicts'
+        };
 
-    //       ],
-    //       label: 'verdicts_data'
-    //     }],
-    //     labels: {{ tags_label|safe }}
-    //   },
-    //   options: {
-    //     responsive: true
-    //   }
-    // };
+        var chart = new google.visualization.PieChart(document.getElementById('verdicts_pie_chart'));
+
+        chart.draw(data, options);
+      }
+</script>
 
 
-    // window.onload = function() {
-    //   var __verdict = document.getElementById('verdict_pie_chart').getContext('2d');
-    //   window.myPie = new Chart(__verdict, verdict_data_config);
-    //   var __tag = document.getElementById('tag_pie_chart').getContext('2d');
-    //   window.myPie = new Chart(__tag, tag_data_config);
-    // };
-
-
-    google.charts.load('current', {packages: ['corechart']});
-    google.charts.setOnLoadCallback(drawVerdictChart);
-    google.charts.setOnLoadCallback(drawTagsChart);
-
-    function drawVerdictChart() {
-      // Define the chart to be drawn.
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Verdict');
-      data.addColumn('number', 'Percentage');
-      data.addRows({{verdicts_data|safe}});
-
-      // Instantiate and draw the chart.
-      var chart = new google.visualization.PieChart(document.getElementById('verdict_pie_chart'));
-      chart.draw(data, null);
-    }
-
-    function drawTagsChart() {
-      // Define the chart to be drawn.
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Verdict');
-      data.addColumn('number', 'Percentage');
-      data.addRows({{tags_data|safe}});
-    };
-
-      // Instantiate and draw the chart.
-      var chart = new google.visualization.PieChart(document.getElementById('tag_pie_chart'));
-      chart.draw(data, null);
-    }
-
-  </script>
-
-
-
-<!--bar plot for rating distribution-->
-<!-- <div id="rating_distribution_container" style="width: 40%">
-    <canvas id="rating_distribution"></canvas>
-</div> -->
-<!--script for rating_distribution bar plot-->
 <script>
-//     var ctx = document.getElementById('rating_distribution').getContext('2d');
-// var myChart = new Chart(ctx, {
-//     type: 'bar',
-//     data: {
-//         labels: {{ratings_label|safe}},
-//         datasets: [{
-//             label: 'Ratings of problems solved',
-//             data: {{ratings_data|safe}},
-//             backgroundColor: [
-//                 'rgba(255, 99, 132, 0.2)',
+       google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
 
-//             ],
-//             borderColor: [
-//                 'rgba(255, 99, 132, 1)',
+      function drawChart() {
 
-//             ],
-//             borderWidth: 1
-//         }]
-//     },
-//     options: {
-//         scales: {
-//             y: {
-//                 beginAtZero: true
-//             }
-//         }
-//     }
-// });
-</script> 
+        var data = google.visualization.arrayToDataTable({{tags_data|safe}});
+
+        var options = {
+          title: 'tags'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('tags_pie_chart'));
+
+        chart.draw(data, options);
+      }
+</script>
+
 
 <script type="text/javascript">
   google.charts.load('current', {'packages':['bar']});
@@ -169,14 +104,6 @@
 
 <!--script for pie chart of tags -->
 
-
-
-{% for key, value in userinfo.items %}
-    <tr>
-        <td>{{ key }} </td>
-        <td>{{ value }} </td>
-    </tr>
-{% endfor %}
 {% endblock %}
 <!--</body>-->
 <!--</html>-->

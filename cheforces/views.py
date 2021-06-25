@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from . import forms
 import urllib.request as request
 import json
-
+import datetime
 
 # getting api response
 def get_api_response(url):
@@ -19,11 +19,29 @@ def get_api_response(url):
 
 
 def homepage(request):
-    return render(request, 'cheforces/base.html')
+
+    return render(request, 'cheforces/base.html',)
 
 
 # codeforces open page
 def cf_openpage(request):
+    #upcoming contests
+    url = "https://codeforces.com/api/contest.list?gym=false"
+    upcoming_contest = get_api_response(url)
+    upcoming_contest=upcoming_contest[0:20]
+    before=[]
+    completed=[]
+    for i in range(len(upcoming_contest)):
+        upcoming_contest[i]['startTimeSeconds']=datetime.datetime.fromtimestamp(int(upcoming_contest[i]['startTimeSeconds'])).strftime('%Y-%m-%d %H:%M:%S')
+        if upcoming_contest[i]['phase']=="BEFORE":
+            before.append(upcoming_contest[i])
+        else :
+            completed.append(upcoming_contest[i])
+
+
+
+
+    #search form
     form = forms.codeforcesform(request.POST or None)
     if request.method == "POST":
         form = forms.codeforcesform(request.POST)
@@ -33,7 +51,9 @@ def cf_openpage(request):
         else:
             form = forms.codeforcesform()
 
-    return render(request, 'cheforces/home.html', {'form': form})
+    return render(request, 'cheforces/home.html', {'form': form,
+                                                   "before":before,
+                                                   "completed" : completed[0:min(len(completed),7)]})
 
 
 # codeforces homepage
@@ -64,14 +84,15 @@ def cf_home(request, handle):
 
     #tags and verdicts labels for drawing pie chart
     
-    # tags_labels = list(question_tags.keys())
-    tags_data= dict_to_list(question_tags)
-    # verdicts_labels = list(verdicts.keys())
-    verdicts_data = dict_to_list(verdicts)
-
-    # ratings_labels = list(ratings.keys())
-    ratings_data = [['Rating','Count']]
+    ratings_data  = [['RATING','COUNT']]
     ratings_data.extend(dict_to_list(ratings))
+
+    tags_data = [['TAGS','DATA']]
+    tags_data.extend(dict_to_list(question_tags))
+
+    verdicts_data = [['VERDICTS', 'COUNT']]
+    verdicts_data.extend(dict_to_list(verdicts))
+
     return render(request, 'cheforces/cfhome.html', {'userinfo': userinfo[0],
                                                      "verdicts_data": verdicts_data,
                                                      "ratings_data":ratings_data,
@@ -81,7 +102,7 @@ def cf_home(request, handle):
 
 
 def dict_to_list(dict):
-    l = []
+    l=[]
     for i,j in dict.items():
         l.append([str(i),j])
     l = sorted(l, key=lambda x: x[1],reverse=True)
