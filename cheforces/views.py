@@ -64,18 +64,25 @@ def cf_home(request, handle):
 
     #tags and verdicts labels for drawing pie chart
     
-    tags_labels = list(question_tags.keys())
-    tags_data= list(question_tags.values())
-    verdicts_labels = list(verdicts.keys())
-    verdicts_data = list(verdicts.values())
+    # tags_labels = list(question_tags.keys())
+    tags_data= dict_to_list(question_tags)
+    # verdicts_labels = list(verdicts.keys())
+    verdicts_data = dict_to_list(verdicts)
 
-    ratings_labels = list(ratings.keys())
-    ratings_data = list(ratings.values())
+    # ratings_labels = list(ratings.keys())
+    ratings_data = [['Rating','Count']]
+    ratings_data.extend(dict_to_list(ratings))
     return render(request, 'cheforces/cfhome.html', {'userinfo': userinfo[0],
-                                                     "verdicts_labels": verdicts_labels,
                                                      "verdicts_data": verdicts_data,
-                                                     "ratings_label":ratings_labels,
                                                      "ratings_data":ratings_data,
-                                                     "tags_label": tags_labels,
                                                      "tags_data": tags_data,
                                                      })
+
+
+
+def dict_to_list(dict):
+    l = []
+    for i,j in dict.items():
+        l.append([str(i),j])
+    l = sorted(l, key=lambda x: x[1],reverse=True)
+    return l
