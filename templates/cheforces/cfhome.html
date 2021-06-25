@@ -22,13 +22,29 @@
       <th scope="row">Current Rank</th>
       <td>{{userinfo.rank}}</td>
     </tr>
+  <tr>
+      <th scope="row">Total Solved</th>
+      <td>{{solved}}</td>
+    </tr>
 
 
   </tbody>
 </table>
 
 <div id="rating_distribution"></div>
+<div>
+{% for i in w_ans.keys %}
+<span><a id="{{i}}" href="https://codeforces.com/contest/{{i}}" target="_blank">{{i}}</a></span>
+<script>
 
+    var ss = document.getElementById("{{i}}");
+    var array = ss.innerHTML.split("/");
+    ss.innerHTML = array[0] + "_" + array[2];
+
+
+</script>
+{% endfor %}
+    </div>
 <table>
     <thead>
         <tr>
