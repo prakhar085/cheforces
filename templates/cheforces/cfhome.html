@@ -27,7 +27,7 @@
   </tbody>
 </table>
 
-<div id="rating_distribution""></div>
+<div id="rating_distribution"></div>
 
 <table>
     <thead>
@@ -39,6 +39,9 @@
         <tr>
             <td><div id="verdicts_pie_chart" style="width: 900px; height: 500px;"></div></td>
             <td><div id="tags_pie_chart" style="width: 900px; height: 500px;"></div></td>
+        </tr>
+        <tr>
+          <td><div id="langs_pie_chart" style="width: 900px; height: 500px;"></div></td>
         </tr>
     </tbody>
 </table>
@@ -78,6 +81,24 @@
 
         chart.draw(data, options);
       }
+</script>
+
+<script>
+  google.charts.load('current', {'packages':['corechart']});
+ google.charts.setOnLoadCallback(drawChart);
+
+ function drawChart() {
+
+   var data = google.visualization.arrayToDataTable({{langs_data|safe}});
+
+   var options = {
+     title: 'Languages used in accepted submissions'
+   };
+
+   var chart = new google.visualization.PieChart(document.getElementById('langs_pie_chart'));
+
+   chart.draw(data, options);
+ }
 </script>
 
 

@@ -73,12 +73,20 @@ def cf_home(request, handle):
     verdicts = {}
     ratings = {}
     question_tags={}
+    langs = {}
     for i in range(len(user_submissions)):
-        verdicts[user_submissions[i]['verdict']] = verdicts.get(user_submissions[i]['verdict'], 0) + 1
-        if "rating" in user_submissions[i]["problem"]  and  user_submissions[i]['verdict']=="OK":
-            ratings[user_submissions[i]['problem']['rating']] = ratings.get(user_submissions[i]['problem']['rating'], 0) + 1
-            for j in range(len(user_submissions[i]['problem']['tags'])):
-                question_tags[user_submissions[i]['problem']['tags'][j]] = question_tags.get(user_submissions[i]['problem']['tags'][j],0)+1
+        if 'verdict' in user_submissions[i]:
+            verdicts[user_submissions[i]['verdict']] = verdicts.get(user_submissions[i]['verdict'], 0) + 1
+            if "rating" in user_submissions[i]["problem"]  and  user_submissions[i]['verdict']=="OK":
+                ratings[user_submissions[i]['problem']['rating']] = ratings.get(user_submissions[i]['problem']['rating'], 0) + 1
+                for j in range(len(user_submissions[i]['problem']['tags'])):
+                    question_tags[user_submissions[i]['problem']['tags'][j]] = question_tags.get(user_submissions[i]['problem']['tags'][j],0)+1
+            if user_submissions[i]['verdict']=="OK":
+                if user_submissions[i]['programmingLanguage'] in langs :                
+                    langs[user_submissions[i]['programmingLanguage']]+=1 
+                else :
+                    langs[user_submissions[i]['programmingLanguage']]=1
+
 
 
 
@@ -93,10 +101,14 @@ def cf_home(request, handle):
     verdicts_data = [['VERDICTS', 'COUNT']]
     verdicts_data.extend(dict_to_list(verdicts))
 
+    langs_data = [['LANGUAGE','COUNT']]
+    langs_data.extend(dict_to_list(langs))
+
     return render(request, 'cheforces/cfhome.html', {'userinfo': userinfo[0],
                                                      "verdicts_data": verdicts_data,
                                                      "ratings_data":ratings_data,
                                                      "tags_data": tags_data,
+                                                     "langs_data": langs_data
                                                      })
 
 
