@@ -142,7 +142,7 @@ def cf_home(request, handle):
             rating_change_str = str(rating_change)
         con_name = con['contestName']
         rank = con['rank']
-        tooltip_text = "'Rating: {}({})  Rank: {}, {}, {}'".format(
+        tooltip_text = "'Rating: {} ({})\\nRank: {}\\n{}\\n{}'".format(
             newRating,
             rating_change_str,
             rank,
