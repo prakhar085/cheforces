@@ -102,7 +102,7 @@ def cf_home(request, handle):
     # tags and verdicts labels for drawing pie chart
 
     ratings_data = [['RATING', 'COUNT']]
-    ratings_data.extend(dict_to_list(ratings))
+    ratings_data.extend(sorted(dict_to_list(ratings),key=lambda x:int(x[0])))
 
     tags_data = [['TAGS', 'DATA']]
     tags_data.extend(dict_to_list(question_tags))
