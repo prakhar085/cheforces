@@ -67,6 +67,10 @@ def cf_home(request, handle):
     url = "https://codeforces.com/api/user.status?handle=" + handle
     user_submissions = get_api_response(url)
 
+
+    #getting  user  contest rating data
+    url ="https://codeforces.com/api/user.rating?handle="+handle
+    d=get_api_response(url)
     # extracting data for verdicts and ratings pie chart
 
     verdicts = {}
@@ -113,6 +117,21 @@ def cf_home(request, handle):
     langs_data = [['LANGUAGE', 'COUNT']]
     langs_data.extend(dict_to_list(langs))
 
+    con_stats = {}
+    con_stats['total'] = len(d)
+    con_stats['best_rank'] = 10000 * 10000
+    con_stats['worst_rank'] = 0
+    con_stats['max_plus'] = -1
+    con_stats['max_minus'] = 5000
+
+    for con in d:
+        con_stats['worst_rank'] = max(con['rank'], con_stats['worst_rank'])
+        con_stats['best_rank'] = min(con['rank'], con_stats['best_rank'])
+        con_stats['max_plus'] = max(con['newRating'] - con['oldRating'], con_stats['max_plus'])
+        con_stats['max_minus'] = min(con['newRating'] - con['oldRating'], con_stats['max_minus'])
+
+    print(con_stats)
+
     return render(request, 'cheforces/cfhome.html', {'userinfo': userinfo[0],
                                                      "verdicts_data": verdicts_data,
                                                      "ratings_data": ratings_data,
@@ -120,6 +139,7 @@ def cf_home(request, handle):
                                                      "langs_data": langs_data,
                                                      "w_ans": w_ans,
                                                      "solved": len(c_ans),
+                                                     "con_stats" : con_stats,
                                                      })
 
 
