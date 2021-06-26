@@ -34,12 +34,12 @@ def cf_openpage(request):
     completed = []
     for i in range(len(upcoming_contest)):
         upcoming_contest[i]['startTimeSeconds'] = datetime.datetime.fromtimestamp(
-            int(upcoming_contest[i]['startTimeSeconds'])).strftime('%Y-%m-%d %H:%M:%S')
+            int(upcoming_contest[i]['startTimeSeconds']))
         if upcoming_contest[i]['phase'] == "BEFORE":
             before.append(upcoming_contest[i])
         else:
             completed.append(upcoming_contest[i])
-
+            
     # search form
     form = forms.codeforcesform(request.POST or None)
     if request.method == "POST":
@@ -82,12 +82,13 @@ def cf_home(request, handle):
     for i in range(len(user_submissions)):
         if 'verdict' in user_submissions[i]:
             key = '{}/problem/{}/'.format(user_submissions[i]['problem']['contestId'], user_submissions[i]['problem']['index'])
+            value = '{}_{}'.format(user_submissions[i]['problem']['contestId'], user_submissions[i]['problem']['index'])
             if user_submissions[i]['verdict'] == "OK":
                 if key in w_ans:
                     del(w_ans[key])
-                c_ans[key] = 1
+                c_ans[key] = value
             else:
-                w_ans[key] = 1
+                w_ans[key] = value
                 if key in c_ans:
                     del(w_ans[key])
             verdicts[user_submissions[i]['verdict']] = verdicts.get(user_submissions[i]['verdict'], 0) + 1
@@ -124,13 +125,35 @@ def cf_home(request, handle):
     con_stats['max_plus'] = -1
     con_stats['max_minus'] = 5000
 
+    ratings_timeline = []
+
     for con in d:
         con_stats['worst_rank'] = max(con['rank'], con_stats['worst_rank'])
         con_stats['best_rank'] = min(con['rank'], con_stats['best_rank'])
         con_stats['max_plus'] = max(con['newRating'] - con['oldRating'], con_stats['max_plus'])
         con_stats['max_minus'] = min(con['newRating'] - con['oldRating'], con_stats['max_minus'])
 
-    print(con_stats)
+        date = datetime.date.fromtimestamp(con['ratingUpdateTimeSeconds'])
+        newRating = con['newRating']
+        rating_change = con['newRating'] - con['oldRating']
+        if rating_change >= 0:
+            rating_change_str = '+' + str(rating_change)
+        else:
+            rating_change_str = str(rating_change)
+        con_name = con['contestName']
+        rank = con['rank']
+        tooltip_text = "'Rating: {}({})  Rank: {}, {}, {}'".format(
+            newRating,
+            rating_change_str,
+            rank,
+            con_name,
+            date.strftime('%Y-%m-%d %H:%M'),
+        )
+        ratings_timeline.append([con['ratingUpdateTimeSeconds'],newRating,tooltip_text])
+
+
+
+
 
     return render(request, 'cheforces/cfhome.html', {'userinfo': userinfo[0],
                                                      "verdicts_data": verdicts_data,
@@ -140,6 +163,7 @@ def cf_home(request, handle):
                                                      "w_ans": w_ans,
                                                      "solved": len(c_ans),
                                                      "con_stats" : con_stats,
+                                                     "ratings_timeline": ratings_timeline
                                                      })
 
 

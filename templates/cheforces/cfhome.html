@@ -9,7 +9,7 @@
   <tbody>
     <tr>
       <th scope="row">Handle</th>
-      <td><a href="https://codeforces.com/profile/{{userinfo.handle}}">{{userinfo.handle}}</a></td>
+      <td><a href="https://codeforces.com/profile/{{userinfo.handle}}" target="_blank">{{userinfo.handle}}</a></td>
     </tr>
     <tr>
       <th scope="row">Current Rating</th>
@@ -23,11 +23,10 @@
       <th scope="row">Current Rank</th>
       <td>{{userinfo.rank}}</td>
     </tr>
-  <tr>
+    <tr>
       <th scope="row">Total Solved</th>
       <td>{{solved}}</td>
     </tr>
-
 
   </tbody>
 </table>
@@ -42,17 +41,11 @@
     {% endfor  %}
 </table>
 <div id="rating_distribution"></div>
+<div id="rating_change_timeline"></div>
 <div>
-{% for i in w_ans.keys %}
-<span><a id="{{i}}" href="https://codeforces.com/contest/{{i}}" target="_blank">{{i}}</a></span>
-<script>
+{% for i,j in w_ans.items %}
+<span><a href="https://codeforces.com/contest/{{i}}" target="_blank">{{j}}</a></span>
 
-    var ss = document.getElementById("{{i}}");
-    var array = ss.innerHTML.split("/");
-    ss.innerHTML = array[0] + "_" + array[2];
-
-
-</script>
 {% endfor %}
     </div>
 <table>
@@ -129,21 +122,67 @@
 
 
 <script type="text/javascript">
-  google.charts.load('current', {'packages':['bar']});
-  google.charts.setOnLoadCallback(drawRatingChart);
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
 
-  function drawRatingChart() {
+  function drawChart() {
     var data = google.visualization.arrayToDataTable({{ratings_data|safe}});
 
     var options = {
-      chart: {
-        title: 'Rating Distribution of Problems',
-      }
+      title: 'Rating Distribution of Problems',
+      hAxis: {
+        title: 'Rating',
+      },
+      vAxis: {
+        title: 'Number of Problems Solved',
+      },
     };
 
-    var chart = new google.charts.Bar(document.getElementById('rating_distribution'));
+    var chart = new google.visualization.ColumnChart(document.getElementById('rating_distribution'));
 
-    chart.draw(data, google.charts.Bar.convertOptions(options));
+    chart.draw(data, options);
+  }
+</script>
+
+
+
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = new google.visualization.DataTable();
+    data.addColumn('date');
+    data.addColumn('number');
+    data.addColumn({type: 'string', role: 'tooltip'});
+    {% for i,j,k in ratings_timeline %}
+        var ms = {{i}}*1000;
+        data.addRow([new Date(ms),{{j}},{{k|safe}}]);
+    {% endfor %}
+
+    var options = {
+      title: 'Rating Change Timeline',
+      hAxis: {
+        title: 'Contest Date',
+      },
+      vAxis: {
+        title: 'Rating',
+        height: 500,
+        gridlines: {
+          count: 8,
+        }
+      },
+      pointSize: 5,
+      explorer: {
+        axis: 'horizontal',
+        keepInBounds: true,
+        maxZoomIn: 10.0
+      },
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('rating_change_timeline'));
+
+    chart.draw(data, options);
   }
 </script>
 
