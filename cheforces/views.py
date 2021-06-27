@@ -4,6 +4,8 @@ from . import forms
 import urllib.request as request
 import json
 import datetime
+import pandas as pd
+
 
 
 # getting api response
@@ -20,11 +22,71 @@ def get_api_response(url):
         raise Http404('Codeforces Handle Not Found!!!')
 
 
+def dict_to_list(dict):
+    l = []
+    for i, j in dict.items():
+        l.append([str(i), j])
+    l = sorted(l, key=lambda x: x[1], reverse=True)
+    return l
+
+
+#mapping ranking of a contest
+def rank_mapping(data):
+    df= data
+    for i in df.index:
+        if df.at[i, 'oldRating'] >= 1600 and df.at[i, 'oldRating'] < 1900:
+            df.at[i, "oldranking"] = "Expert"
+        if df.at[i, 'oldRating'] >= 0 and df.at[i, 'oldRating'] < 1200:
+            df.at[i, 'oldranking'] = "Newbie"
+        if df.at[i, 'oldRating'] >= 1200 and df.at[i, 'oldRating'] < 1400:
+            df.at[i, 'oldranking'] = "Pupil"
+        if df.at[i, 'oldRating'] >= 1400 and df.at[i, 'oldRating'] < 1600:
+            df.at[i, "oldranking"] = "Specialist"
+        if df.at[i, 'oldRating'] >= 1900 and df.at[i, 'oldRating'] < 2100:
+            df.at[i, 'oldranking'] = "CandidateMaster"
+        if df.at[i, 'oldRating'] >= 2100 and df.at[i, 'oldRating'] < 2300:
+            df.at[i, 'oldranking'] = "Master"
+        if df.at[i, 'oldRating'] >= 2300 and df.at[i, 'oldRating'] < 2400:
+            df.at[i, "oldranking"] = "InternationalMaster"
+        if df.at[i, 'oldRating'] >= 2400 and df.at[i, 'oldRating'] < 2600:
+            df.at[i, 'oldranking'] = "GrandMaster"
+        if df.at[i, 'oldRating'] >= 2600 and df.at[i, 'oldRating'] < 3000:
+            df.at[i, 'oldranking'] = "InternationalGrandMaster"
+
+    for i in df.index:
+        if df.at[i, 'newRating'] >= 1600 and df.at[i, 'newRating'] < 1900:
+            df.at[i, "newranking"] = "Expert"
+
+        if df.at[i, 'newRating'] >= 0 and df.at[i, 'newRating'] < 1200:
+            df.at[i, 'newranking'] = "Newbie"
+
+        if df.at[i, 'newRating'] >= 1200 and df.at[i, 'newRating'] < 1400:
+            df.at[i, 'newranking'] = "Pupil"
+
+        if df.at[i, 'newRating'] >= 1400 and df.at[i, 'newRating'] < 1600:
+            df.at[i, "newranking"] = "Specialist"
+        if df.at[i, 'newRating'] >= 1900 and df.at[i, 'newRating'] < 2100:
+            df.at[i, 'newranking'] = "CandidateMaster"
+        if df.at[i, 'newRating'] >= 2100 and df.at[i, 'newRating'] < 2300:
+            df.at[i, 'newranking'] = "Master"
+        if df.at[i, 'newRating'] >= 2300 and df.at[i, 'newRating'] < 2400:
+            df.at[i, "newranking"] = "InternationalMaster"
+        if df.at[i, 'newRating'] >= 2400 and df.at[i, 'newRating'] < 2600:
+            df.at[i, 'newranking'] = "GrandMaster"
+        if df.at[i, 'newRating'] >= 2600 and df.at[i, 'newRating'] < 3000:
+            df.at[i, 'newranking'] = "InternationalGrandMaster"
+
+    df["ratingchange"] = df.apply(lambda row:
+                                  row["newRating"] - row["oldRating"], axis=1)
+'''_________________________________________________________________________________________________________________'''
+
+
 def homepage(request):
     return render(request, 'cheforces/base.html', )
 
 
-# codeforces open page
+
+#home page
 def cf_openpage(request):
     # upcoming contests
     url = "https://codeforces.com/api/contest.list?gym=false"
@@ -55,9 +117,7 @@ def cf_openpage(request):
                                                    "completed": completed[0:min(len(completed), 7)]})
 
 
-# codeforces homepage
-
-
+#codeforces user homepage
 def cf_home(request, handle):
     # getting basic user info
     url = "https://codeforces.com/api/user.info?handles=" + handle
@@ -152,9 +212,6 @@ def cf_home(request, handle):
         ratings_timeline.append([con['ratingUpdateTimeSeconds'],newRating,tooltip_text])
 
 
-
-
-
     return render(request, 'cheforces/cfhome.html', {'userinfo': userinfo[0],
                                                      "verdicts_data": verdicts_data,
                                                      "ratings_data": ratings_data,
@@ -166,10 +223,7 @@ def cf_home(request, handle):
                                                      "ratings_timeline": ratings_timeline
                                                      })
 
+#contest analysis
+def contest_analysis(request,con_id):
+    return render(request,"cheforces/contest_analysis.html",{"p" : con_id})
 
-def dict_to_list(dict):
-    l = []
-    for i, j in dict.items():
-        l.append([str(i), j])
-    l = sorted(l, key=lambda x: x[1], reverse=True)
-    return l

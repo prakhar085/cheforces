@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import  views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.cf_openpage,name= 'home'),
-    path('cfuser/<str:handle>',views.cf_home)
+    path('cfuser/<str:handle>',views.cf_home),
+    path('contest/<str:con_id>',views.contest_analysis),
 ]
