@@ -6,7 +6,7 @@ import json
 import datetime
 import pandas as pd
 
-
+from collections import defaultdict
 
 # getting api response
 def get_api_response(url):
@@ -78,9 +78,24 @@ def rank_mapping(data):
 
     df["ratingchange"] = df.apply(lambda row:
                                   row["newRating"] - row["oldRating"], axis=1)
+
+
+#problems columns creating
+def problem_sep(df):
+    problems = df["problemResults"].apply(pd.Series)
+    questions = len(problems.columns)
+    new_columns = defaultdict(list)
+    for i in range(len(problems)):
+        for j, val in enumerate(problems.loc[i]):
+            for item in val:
+                new_columns['{}|{}'.format(item, j)].append(val[item])
+
+    return new_columns
+
+
 '''_________________________________________________________________________________________________________________'''
 
-
+''''_________________________________________________________________________________________________________________'''
 def homepage(request):
     return render(request, 'cheforces/base.html', )
 
@@ -220,10 +235,32 @@ def cf_home(request, handle):
                                                      "w_ans": w_ans,
                                                      "solved": len(c_ans),
                                                      "con_stats" : con_stats,
-                                                     "ratings_timeline": ratings_timeline
+                                                     "ratings_timeline": ratings_timeline,
                                                      })
 
 #contest analysis
 def contest_analysis(request,con_id):
-    return render(request,"cheforces/contest_analysis.html",{"p" : con_id})
+
+    #rating change statistics
+    url = "https://codeforces.com/api/contest.ratingChanges?contestId="+con_id
+    rating_changes = pd.DataFrame(get_api_response(url))
+    rating_changes = rating_changes.drop(columns=["contestName", "ratingUpdateTimeSeconds", "contestId"])
+    rank_mapping(rating_changes)
+    participants = rating_changes['oldranking'].value_counts().to_dict()
+    print(participants)
+
+    #contest all submissions statistics
+    url ="https://codeforces.com/api/contest.standings?contestId="+con_id+"&showUnofficial=false"
+    data = get_api_response(url)
+    df = pd.DataFrame(data["rows"])
+    df = df.drop(columns=["points", "successfulHackCount", "unsuccessfulHackCount"])
+    new_columns=problem_sep(df)
+    print(new_columns)
+    problems2 = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in new_columns.items()]))
+    final_dataset = pd.concat([rating_changes, problems2], axis=1)
+
+
+
+    return render(request,"cheforces/contest_analysis.html",{"p" : con_id,
+                                                             "participants" : participants,})
 
